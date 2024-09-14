@@ -1,8 +1,10 @@
+//! ファイル群を段階的にシミュレートする
 #![allow(dead_code)]
 
 use std::fmt;
 use std::fmt::{Display};
 
+/// file は、アクセス可能なファイルを意味する
 #[derive(Debug, PartialEq)]
 pub enum FileState {
     Open,
@@ -32,6 +34,7 @@ impl Display for File {
 }
 
 impl File {
+    /// 新規ファイルは空とみなすが、ファイル名は必須
     pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
