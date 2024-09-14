@@ -1,18 +1,38 @@
+#![allow(dead_code)]
+
+use std::fmt;
+use std::fmt::{Display};
+
 #[derive(Debug, PartialEq)]
-enum FileState {
+pub enum FileState {
     Open,
     Closed,
 }
 
 #[derive(Debug)]
-struct File {
-    name: String,
+pub struct File {
+    pub name: String,
     data: Vec<u8>,
     state: FileState,
 }
 
+impl Display for FileState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match *self {
+            FileState::Open => write!(f, "OPEN"),
+            FileState::Closed => write!(f, "CLOSED"),
+        }
+    }
+}
+
+impl Display for File {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<{}({})>", self.name, self.state)
+    }
+}
+
 impl File {
-    fn new(name: &str) -> File {
+    pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
             data: Vec::new(),
@@ -61,6 +81,7 @@ fn main() {
     let text = String::from_utf8_lossy(&buffer);
 
     println!("{:?}", f);
+    println!("{}", f);
     println!("{} is {} byte long", &f.name, f3_length);
     println!("{}", text);
 }
