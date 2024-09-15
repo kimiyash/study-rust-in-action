@@ -1,55 +1,109 @@
-#![allow(unused_variables)]
+use std::rc::Rc;
+use std::cell::RefCell;
 
-use std::mem::MaybeUninit;
-#[derive(Debug)]
+#[derive(Copy, Debug)]
 struct CubeSat {
     id: u64,
-    mailbox: Mailbox,
 }
 
 impl CubeSat {
-    fn recv(&mut self) -> Option<Message> {
-        self.mailbox.message.pop()
+    fn recv(&mut self, mailbox: &mut Mailbox) -> Option<Message> {
+        mailbox.deliver(&self)
     }
 }
 
-#[derive(Debug)]
+impl Clone for CubeSat {
+    fn clone(&self) -> Self {{
+        CubeSat { id: self.id }
+    }}
+}
+
+fn fetch_sat_ids() -> Vec<u64> {
+    vec![1, 2, 3]
+}
+
+#[derive(Copy, Debug)]
 enum StatusMessage {
     Ok,
 }
 
-type Message = String;
-
-#[derive(Debug)]
-struct Mailbox {
-    message: Vec<Message>,
-}
-
-struct GrandStation;
-
-impl GrandStation {
-    fn send(&self, to: &mut CubeSat, msg: Message) {
-        to.mailbox.message.push(msg);
+impl Clone for StatusMessage {
+    fn clone(&self) -> Self {
+        *self
     }
 }
-fn check_status(sat_id: &CubeSat) -> StatusMessage {
+
+fn check_tatus(sat_id: CubeSat) -> StatusMessage {
     StatusMessage::Ok
 }
 
+#[derive(Debug)]
+struct  Message {
+    to: u64,
+    content: String,
+}
+
+#[derive(Debug)]
+struct Mailbox {
+    messages: Vec<Message>,
+}
+
+impl Mailbox {
+    fn post(&mut self, msg: Message) {
+        self.messages.push(msg);
+    }
+
+    fn deliver(&mut self, recipent: &CubeSat) -> Option<Message> {
+        for i in 0..self.messages.len() {
+            if self.messages[i].to == recipent.id {
+                let msg = self.messages.remove(i);
+                return Some(msg)
+            }
+        }
+        None
+    }
+}
+
+#[derive(Debug)]
+struct GrandStation {
+    radio_freq: f64,
+}
+
+impl GrandStation {
+    fn connect(&self, sat_id: u64) -> CubeSat {
+        CubeSat { id: sat_id }
+    }
+
+    fn send(&self, mailbox: &mut Mailbox, msg: Message) {
+        mailbox.post(msg);
+    }
+}
+
 fn main() {
-    let base = GrandStation {};
-    let mut sat_a = CubeSat {
-        id: 0,
-        mailbox: Mailbox {
-            message: vec![],
-        },
-    };
+    let mut mail = Mailbox { messages: vec![] };
+    let base = Rc::new(RefCell::new(
+        GrandStation { radio_freq: 87.65 }
+    ));
+    let sat_ids = fetch_sat_ids();
 
-    println!("t0: {:?}", sat_a);
-    base.send(&mut sat_a, Message::from("hello there!"));
-    println!("t1: {:?}", sat_a);
+    println!("base: {:?}", base);
+    {
+        let mut base2 = base.borrow_mut();
+        base2.radio_freq -= 12.34;
+        println!("base2: {:?}", base2);
+    }
+    println!("base: {:?}", base);   
 
-    let msg = sat_a.recv();
-    println!("t2: {:?}", sat_a);
-    println!("msg: {:?}", msg);
+    for sat_id in sat_ids {
+        let msg = Message { to: sat_id, content: String::from("hello") };
+        base.borrow().send(&mut mail, msg);
+    }
+
+    let sat_ids = fetch_sat_ids();
+
+    for sat_id in sat_ids {
+        let mut sat = base.borrow().connect(sat_id);
+        let msg = sat.recv(&mut mail);
+        println!("{:?}: {:?}", sat, msg);
+    }
 }
