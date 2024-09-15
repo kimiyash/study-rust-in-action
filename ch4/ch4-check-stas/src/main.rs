@@ -90,16 +90,12 @@ fn main() {
     println!("base: {:?}", base);   
 
     let sat_ids = fetch_sat_ids();
-
-    for sat_id in sat_ids {
-        let msg = Message { to: sat_id, content: String::from("hello") };
+    for sat_id in &sat_ids {
+        let msg = Message { to: *sat_id, content: String::from("hello") };
         base.borrow().send(&mut mail, msg);
     }
-
-    let sat_ids = fetch_sat_ids();
-
-    for sat_id in sat_ids {
-        let mut sat = base.borrow().connect(sat_id);
+    for sat_id in &sat_ids {
+        let mut sat = base.borrow().connect(*sat_id);
         let msg = sat.recv(&mut mail);
         println!("{:?}: {:?}", sat, msg);
     }
