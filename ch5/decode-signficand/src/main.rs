@@ -32,7 +32,7 @@ fn main() {
         let significand_bits = n_bits & 0x7fffff;
         let significand = 1.0 + (significand_bits as f32) / (1 << 23) as f32;
         
-        // 値を計算: sign * significand * 2^exponent
+        // 値を計算: sign * significand * 2^exponent    
         let result = sign * significand * 2_f32.powi(exponent);
 
         println!("significand: {}", significand);
