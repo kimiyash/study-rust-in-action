@@ -80,7 +80,6 @@ fn main() {
     let base = Rc::new(RefCell::new(
         GrandStation { radio_freq: 87.65 }
     ));
-    let sat_ids = fetch_sat_ids();
 
     println!("base: {:?}", base);
     {
@@ -89,6 +88,8 @@ fn main() {
         println!("base2: {:?}", base2);
     }
     println!("base: {:?}", base);   
+
+    let sat_ids = fetch_sat_ids();
 
     for sat_id in sat_ids {
         let msg = Message { to: sat_id, content: String::from("hello") };
