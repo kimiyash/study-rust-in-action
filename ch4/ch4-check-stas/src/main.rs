@@ -1,21 +1,15 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-#[derive(Copy, Debug)]
+#[derive(Debug)]
 struct CubeSat {
     id: u64,
 }
 
 impl CubeSat {
-    fn recv(&mut self, mailbox: &mut Mailbox) -> Option<Message> {
+    fn recv(&self, mailbox: &mut Mailbox) -> Option<Message> {
         mailbox.deliver(&self)
     }
-}
-
-impl Clone for CubeSat {
-    fn clone(&self) -> Self {{
-        CubeSat { id: self.id }
-    }}
 }
 
 fn fetch_sat_ids() -> Vec<u64> {
@@ -95,7 +89,7 @@ fn main() {
         base.borrow().send(&mut mail, msg);
     }
     for sat_id in &sat_ids {
-        let mut sat = base.borrow().connect(*sat_id);
+        let sat = base.borrow().connect(*sat_id);
         let msg = sat.recv(&mut mail);
         println!("{:?}: {:?}", sat, msg);
     }
