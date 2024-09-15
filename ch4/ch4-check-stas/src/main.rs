@@ -33,10 +33,6 @@ impl Clone for StatusMessage {
     }
 }
 
-fn check_tatus(sat_id: CubeSat) -> StatusMessage {
-    StatusMessage::Ok
-}
-
 #[derive(Debug)]
 struct  Message {
     to: u64,
