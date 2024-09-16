@@ -41,14 +41,13 @@ fn main() {
     println!("値: {:?}", C);
 
     let a = 42;
-    let b: String;
-    let c: Cow<str>;
 
-    unsafe {
-        let b_ptr = &B as *const u8 as *mut u8;
-        b = String::from_raw_parts(b_ptr, 10, 10);
-        let c_ptr = &C as *const u8 as *const c_char;
-        c = CStr::from_ptr(c_ptr).to_string_lossy();
-    }
+    // let b_ptr = &B as *const u8 as *mut u8;
+    // let b = unsafe { String::from_raw_parts(b_ptr, 10, 10) };
+    let b_slice = &B[..];
+    let b = String::from_utf8_lossy(b_slice).into_owned();
+    let c_ptr = &C as *const u8 as *const c_char;
+    let c = unsafe { CStr::from_ptr(c_ptr).to_string_lossy() };
+
     println!("a: {}, b: {}, c: {}", a, b, c);
 }
