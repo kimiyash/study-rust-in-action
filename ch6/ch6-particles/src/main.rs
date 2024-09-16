@@ -18,9 +18,6 @@ unsafe impl GlobalAlloc for ReportingAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let start = Instant::now();
         let ptr = System.alloc(layout);
-        if ptr.is_null() {
-            panic!("Allocation failed");
-        }
         let end = Instant::now();
         let time_taken = end - start;
         let bytes_requested = layout.size();
@@ -100,7 +97,7 @@ impl World {
         for _ in 0..n.abs() {
             let particle = Particle::new(&self);
             let boxed_particle = Box::new(particle);
-            self.particles.push(boxed_particle);           
+            self.particles.push(boxed_particle);
         }
     }
 
