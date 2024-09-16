@@ -1,6 +1,9 @@
 [package]
 name = "ch6-particles"
 version = "0.1.0"
-edition = "2021"
+edition = "2018"
 
 [dependencies]
+piston_window = "0.117"
+piston2d-graphics = "0.39"
+rand = "0.8"
