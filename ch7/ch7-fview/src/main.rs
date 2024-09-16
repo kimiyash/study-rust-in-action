@@ -12,7 +12,7 @@ fn main() {
     let mut pos = 0;
     let mut buffer = [0; BYTES_PER_LINE];
 
-    while let Ok(_) = f.read_exact(&mut buffer) {
+    while let Ok(readlen) = (&mut f).take(BYTES_PER_LINE as u64).read(&mut buffer) {
         print!("[0x{:08}]", pos);
         for byte in &buffer {
             match *byte {
@@ -23,5 +23,9 @@ fn main() {
         }
         println!();
         pos += BYTES_PER_LINE;
+        buffer.fill(0);
+        if readlen < BYTES_PER_LINE {
+            break;
+        }
     }
 }
