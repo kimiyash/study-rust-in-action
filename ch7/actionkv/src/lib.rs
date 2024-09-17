@@ -76,7 +76,7 @@ impl ActionKV {
         let mut f = BufReader::new(&mut self.f);
 
         loop {
-            let current_position = f.seek(SeekFrom::Current(0))?;
+            let current_position = f.stream_position()?;
 
             let maybe_kv = ActionKV::process_record(&mut f);
             let kv = match maybe_kv {
