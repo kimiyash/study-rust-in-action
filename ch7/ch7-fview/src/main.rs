@@ -22,6 +22,7 @@ fn main() {
             }
         }
         println!();
+        
         pos += BYTES_PER_LINE;
         buffer.fill(0);
         if readlen < BYTES_PER_LINE {

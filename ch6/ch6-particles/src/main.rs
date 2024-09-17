@@ -1,35 +1,6 @@
 use graphics::math::{Vec2d, add, mul_scalar};
-
 use piston_window::*;
-
 use rand::prelude::*;
-
-use std::alloc::{GlobalAlloc, System, Layout};
-
-use std::time::Instant;
-
-
-#[global_allocator]
-static ALLOCATOR: ReportingAllocator = ReportingAllocator;
-
-struct ReportingAllocator;
-
-unsafe impl GlobalAlloc for ReportingAllocator {
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        let start = Instant::now();
-        let ptr = System.alloc(layout);
-        let end = Instant::now();
-        let time_taken = end - start;
-        let bytes_requested = layout.size();
-
-        eprintln!("{}\t{}", bytes_requested, time_taken.as_nanos());
-        ptr
-    }
-
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        System.dealloc(ptr, layout);
-    }
-}
 
 struct World {
     current_turn: u64,
@@ -87,8 +58,8 @@ impl World {
         World {
             current_turn: 0,
             particles: Vec::<Box<Particle>>::new(),
-            height: height,
-            width: width,
+            height,
+            width,
             rng: thread_rng(),
         }
     }
@@ -105,21 +76,19 @@ impl World {
         for _ in 0..n.abs() {
             let mut to_delete = None;
 
-            let partice_iter = self.particles
+            let particle_iter = self.particles
                 .iter()
                 .enumerate();
 
-            for (i, particle) in partice_iter {
+            for (i, particle) in particle_iter {
                 if particle.color[3] < 0.02 {
                     to_delete = Some(i);
+                    break;
                 }
-                break;
             }
 
             if let Some(i) = to_delete {
                 self.particles.remove(i);
-            } else {
-                self.particles.remove(0);
             }
         }
     }
@@ -149,10 +118,9 @@ fn main() {
     .exit_on_esc(true)
     .build()
     .expect("Could not create window.");
-
+    
     let mut world = World::new(width, height);
-    // world.add_shapes(1000);
-    world.add_shapes(1);
+    world.add_shapes(1000);
 
     while let Some(event) = window.next() {
         world.update();
