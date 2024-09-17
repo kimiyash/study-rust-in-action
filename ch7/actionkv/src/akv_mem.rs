@@ -31,8 +31,10 @@ fn main() {
 
     match action {
         "get" => match store.get(key).unwrap() {
-            None => eprintln!("{:?} not found", key),
-            Some(value) => println!("{:?}", value),
+            None => eprintln!("{:?}:{} not found", key, String::from_utf8_lossy(key)),
+            Some(value) => {
+                println!("{:?}, {}", value, String::from_utf8_lossy(&value));
+            }
         },
 
         "delete" => store.delete(key).unwrap(),
