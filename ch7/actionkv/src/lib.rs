@@ -94,7 +94,7 @@ impl ActionKV {
                     }
                 }
             };
-            // 先行する処理で同じキーがあってもここでファイル内のkeyがある場所が上書きされる insert の処理は末尾に追加しているだけ
+            // 先行する処理で同じキーがあってもここでファイル内のkeyがあるpositionが上書きされる
             self.index.insert(kv.key, current_position);
         }
 
@@ -172,7 +172,7 @@ impl ActionKV {
         Ok(())
     }
 
-    pub fn insert_but_ignore_index(
+    pub fn insert_but_ignore_index( // insert の処理は末尾に追加しているだけ
         &mut self,
         key: &ByteStr,
         value: &ByteStr
@@ -194,14 +194,14 @@ impl ActionKV {
         let checksum = crc32::checksum_ieee(&tmp);
 
         let next_byte = SeekFrom::End(0);
-        let current_position = f.seek(SeekFrom::Current(0))?;
+        let current_position = f.seek(SeekFrom::Current(0))?; // 特に意味はないしどこを指しているのか不明
         f.seek(next_byte)?;
         f.write_u32::<LittleEndian>(checksum)?;
         f.write_u32::<LittleEndian>(key_len as u32)?;
         f.write_u32::<LittleEndian>(val_len as u32)?;
         f.write_all(&tmp)?;
 
-        Ok(current_position)
+        Ok(current_position) // 作者いわく標準ライブラリの hash と同じ実装にしたかったとのこと
     }
 
     #[inline]
