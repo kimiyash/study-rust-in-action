@@ -168,7 +168,7 @@ impl ActionKV {
     ) -> io::Result<()> {
         let position = self.insert_but_ignore_index(key, value)?;
 
-        self.index.insert(key.to_vec(), position);
+        self.index.insert(key.to_vec(), position); // ここでメモリ上のhashmapにインサートしても後続の処理で get されるわけでは無いので、意図不明
         Ok(())
     }
 
