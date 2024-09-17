@@ -90,7 +90,7 @@ impl ActionKV {
                     }
                 }
             };
-            // 先行する処理で同じキーがあってもここでファイル内のkeyがあるpositionが上書きされる
+            // 先行する処理で同じkeyがあっても、ここでファイル内のkeyがあるpositionが上書きされる
             self.index.insert(kv.key, current_position);
         }
 
