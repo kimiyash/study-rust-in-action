@@ -103,7 +103,7 @@ impl ActionKV {
     ) -> io::Result<Option<ByteString>> {
         let position = match self.index.get(key) {
             None => return Ok(None),
-            Some(position) => *position,
+            Some(&position) => position,
         };
 
         let kv = self.get_at(position)?;
