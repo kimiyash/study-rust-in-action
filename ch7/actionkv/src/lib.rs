@@ -94,7 +94,7 @@ impl ActionKV {
                     }
                 }
             };
-
+            // 先行する処理で同じキーがあってもここでファイル内のkeyがある場所が上書きされる insert の処理は末尾に追加しているだけ
             self.index.insert(kv.key, current_position);
         }
 
