@@ -72,10 +72,6 @@ impl ActionKV {
         Ok(KeyValuePair { key, value})
     }
 
-    pub fn seek_to_end(&mut self) -> io::Result<u64> {
-        self.f.seek(SeekFrom::End(0))
-    }
-
     pub fn load(&mut self) -> io::Result<()> {
         let mut f = BufReader::new(&mut self.f);
 
@@ -126,57 +122,11 @@ impl ActionKV {
         Ok(kv)
     }
 
-    pub fn find(
-        &mut self,
-        target: &ByteStr
-    ) -> io::Result<Option<(u64, ByteString)>> {
-        let mut f = BufReader::new(&mut self.f);
-
-        let mut found: Option<(u64, ByteString)> = None;
-
-        loop {
-            let position = f.seek(SeekFrom::Current(0))?;
-
-            let maybe_kv = ActionKV::process_record(&mut f);
-            let kv = match maybe_kv {
-                Ok(kv) => kv,
-                Err(err) => {
-                    match err.kind() {
-                        io::ErrorKind::UnexpectedEof => {
-                            break;
-                        }
-                        _ => return Err(err),
-                    }
-                }
-            };
-
-            if kv.key == target {
-                found = Some((position, kv.value));
-            }
-
-
-
-        }
-
-        Ok(found)
-    }
-
-    pub fn insert(
+    pub fn insert( // insert の処理は末尾に追加しているだけ、延々ファイルは大きくなり続ける
         &mut self,
         key: &ByteStr,
         value: &ByteStr
     ) -> io::Result<()> {
-        let position = self.insert_but_ignore_index(key, value)?;
-
-        self.index.insert(key.to_vec(), position); // ここでメモリ上のhashmapにインサートしても後続の処理で get されるわけでは無いので、意図不明
-        Ok(())
-    }
-
-    pub fn insert_but_ignore_index( // insert の処理は末尾に追加しているだけ
-        &mut self,
-        key: &ByteStr,
-        value: &ByteStr
-    ) -> io::Result<u64> {
         let mut f = BufWriter::new(&mut self.f);
 
         let key_len = key.len();
@@ -193,15 +143,13 @@ impl ActionKV {
 
         let checksum = crc32::checksum_ieee(&tmp);
 
-        let next_byte = SeekFrom::End(0);
-        let current_position = f.seek(SeekFrom::Current(0))?; // 特に意味はないしどこを指しているのか不明
-        f.seek(next_byte)?;
+        f.seek(SeekFrom::End(0))?;
         f.write_u32::<LittleEndian>(checksum)?;
         f.write_u32::<LittleEndian>(key_len as u32)?;
         f.write_u32::<LittleEndian>(val_len as u32)?;
         f.write_all(&tmp)?;
 
-        Ok(current_position) // 作者いわく標準ライブラリの hash と同じ実装にしたかったとのこと
+        Ok(())
     }
 
     #[inline]
