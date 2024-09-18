@@ -24,8 +24,8 @@ fn main() {
         .value_of("dns-server").unwrap();
     let dns_server: SocketAddr =
         format!("{}:53", dns_server_raw)
-        .parse()
-        .expect("invalid address");
+            .parse()
+            .expect("invalid address");
 
     let mut request_as_bytes: Vec<u8> =
         Vec::with_capacity(512);
