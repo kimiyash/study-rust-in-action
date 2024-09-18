@@ -145,11 +145,12 @@ impl ActionKV {
 
         f.seek(SeekFrom::End(0))?;
         let current_position = f.stream_position()?;
-        self.index.insert(key.to_vec(), current_position);
         f.write_u32::<LittleEndian>(checksum)?;
         f.write_u32::<LittleEndian>(key_len as u32)?;
         f.write_u32::<LittleEndian>(val_len as u32)?;
         f.write_all(&tmp)?;
+
+        self.index.insert(key.to_vec(), current_position);
 
         Ok(())
     }
