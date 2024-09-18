@@ -23,7 +23,7 @@ impl MacAddress {
     fn new() -> MacAddress {
         let mut octets: [u8; 6] = [0; 6];
         thread_rng().fill_bytes(&mut octets);
-        octets[0] |= 0b_0000_0011; // unicast に設定
+        octets[0] |= 0b_0000_0011; // unicast local に設定
         MacAddress(octets)
     }
 
