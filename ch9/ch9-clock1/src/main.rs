@@ -65,7 +65,7 @@ impl From<DateTime<Utc>> for NTPTimestamp {
         }
     }
 }
-  
+
 impl NTPMessage {
     fn new() -> Self {
         NTPMessage {
