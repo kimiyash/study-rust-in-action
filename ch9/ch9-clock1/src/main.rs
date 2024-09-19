@@ -48,10 +48,10 @@ impl From<NTPTimestamp> for DateTime<Utc> {
         nanos *= 1e9;
         nanos /= 2_f64.powi(32);
 
-        Utc.timestamp(secs, nanos as u32)
+        Utc.timestamp_opt(secs, nanos as u32).unwrap()
     }
 }
-  
+
 impl From<DateTime<Utc>> for NTPTimestamp {
     fn from(utc: DateTime<Utc>) -> Self {
         let secs = utc.timestamp() + NTP_TO_UNIX_SECONDS;
