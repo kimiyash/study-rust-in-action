@@ -1,6 +1,7 @@
-use chrono::DateTime;
-use chrono::Local;
+use chrono::{DateTime, Local, TimeZone};
 use clap::{App, Arg};
+use std::mem::zeroed;
+use libc;
 
 struct Clock;
 
@@ -9,8 +10,20 @@ impl Clock {
         Local::now()
     }
 
-    fn set() -> ! {
-        unimplemented!()
+    fn set<Tz: TimeZone>(t: DateTime<Tz>) -> () {
+        use libc::{timeval, time_t, suseconds_t};
+        use libc::{settimeofday, timezone};
+
+        let t = t.with_timezone(&Local);
+        let mut u: timeval = unsafe { zeroed() };
+
+        u.tv_sec = t.timestamp() as time_t;
+        u.tv_usec = t.timestamp_subsec_micros() as suseconds_t;
+
+        unsafe {
+            let mock_tz: *const timezone = std::ptr::null();
+            settimeofday(&u as *const timeval, mock_tz);
+        }
     }
 }
 
@@ -47,7 +60,21 @@ fn main() {
     let std = args.value_of("std").unwrap();
 
     if action == "set" {
-        unimplemented!()
+        let t_ = args.value_of("datetime").unwrap();
+
+        let parser = match std {
+            "rfc2822" => DateTime::parse_from_rfc2822,
+            "rfc3339" => DateTime::parse_from_rfc3339,
+            _ => unreachable!(),
+        };
+
+        let err_msg = format!(
+            "Unable to parse {} according to {}",
+            t_, std
+        );
+        let t = parser(t_).expect(&err_msg);
+
+        Clock::set(t);
     }
 
     let now = Clock::get();
