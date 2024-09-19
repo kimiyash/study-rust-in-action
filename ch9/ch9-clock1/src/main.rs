@@ -75,7 +75,7 @@ impl NTPMessage {
 
     fn client() -> Self {
         const VERSION: u8 = 0b00_011_000;
-        const MODE: u8    = 0b00_000_011;
+        const MODE: u8 = 0b00_000_011;
 
         let mut msg = NTPMessage::new();
 
@@ -89,8 +89,8 @@ impl NTPMessage {
         i: usize,
     ) -> Result<NTPTimestamp, std::io::Error> {
         let mut reader = &self.data[i..i + 8];
-        let seconds    = reader.read_u32::<BigEndian>()?;
-        let fraction   = reader.read_u32::<BigEndian>()?;
+        let seconds = reader.read_u32::<BigEndian>()?;
+        let fraction = reader.read_u32::<BigEndian>()?;
 
         Ok(NTPTimestamp {
             seconds,
