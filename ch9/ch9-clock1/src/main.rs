@@ -175,7 +175,7 @@ impl NTPMessage {
     for &server in servers.iter() {
       print!("{} =>", server);
   
-      let calc = ntp_roundtrip(&server, NTP_PORT);
+      let calc = ntp_roundtrip(server, NTP_PORT);
   
       match calc {
         Ok(time) => {
@@ -287,7 +287,8 @@ fn main() {
 
         let now: DateTime<Utc> = Utc::now() + adjust_ms;
 
-        Clock::set(now);
+        println!("{now}");
+        // Clock::set(now);
     }
 
     let maybe_error = std::io::Error::last_os_error();
