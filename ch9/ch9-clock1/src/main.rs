@@ -31,7 +31,7 @@ struct NTPResult {
 
 impl NTPResult {
     fn offset(&self) -> i64 {
-        let duration = (self.t2 - self.t1) + (self.t3 - self.t4);
+        let duration = ((self.t2 - self.t1) + (self.t3 - self.t4)) / 2;
         duration.num_milliseconds()
     }
   
