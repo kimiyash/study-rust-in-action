@@ -1,5 +1,3 @@
-use rand;
-
 static mut SHUT_DOWN: bool = false;
 
 fn main() {
